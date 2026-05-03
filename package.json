@@ -5,9 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "concurrently \"vite\" \"npm run dev:server\"",
-    "dev:server": "NODE_ENV=dev nodemon ./server",
-    "start": "node ./server",
-    "build": "vite build",
+    "dev:server": "NODE_ENV=dev tsx watch ./server/index.ts",
+    "start": "node ./dist-server/server/index.js",
+    "build": "npm run build:client && npm run build:server",
+    "build:client": "vite build",
+    "build:server": "tsc -p tsconfig.server.json",
+    "type-check": "tsc --noEmit",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -25,8 +28,12 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",
-    "@types/react": "^19.0.10",
-    "@types/react-dom": "^19.0.4",
+    "@types/express": "^5.0.6",
+    "@types/morgan": "^1.9.10",
+    "@types/node": "^25.6.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@types/validator": "^13.15.10",
     "@vitejs/plugin-react": "^4.3.4",
     "concurrently": "^9.1.2",
     "eslint": "^9.21.0",
@@ -34,6 +41,8 @@
     "eslint-plugin-react-refresh": "^0.4.19",
     "globals": "^15.15.0",
     "nodemon": "^3.1.9",
+    "tsx": "^4.21.0",
+    "typescript": "^6.0.3",
     "vite": "^6.2.0"
   }
 }

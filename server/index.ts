@@ -1,15 +1,15 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import rateLimit from 'express-rate-limit';
 import morgan from 'morgan';
 import path from 'path';
 import { downloadLogo } from './get.js';
 
-const PORT = parseInt(process.env.PORT) || 3007
+const PORT: number = parseInt(process.env.PORT || '3007');
 const app = express();
 
 const isDev = process.env.NODE_ENV === 'dev';
 
-console.log(isDev);
+console.log(`Development mode: ${isDev}`);
 
 const distPath = path.resolve('dist');
 
@@ -29,18 +29,23 @@ if(!isDev) {
   app.use(express.static(distPath));
 }
 
-app.get('/api/getLogo', async (req, res) => {
+app.get('/api/getLogo', async (req: Request, res: Response) => {
   try {
-    const result = await downloadLogo(req.query.q);
+    const queryQ = req.query.q;
+    if (typeof queryQ !== 'string') {
+      return res.status(400).send("Query parameter 'q' is required and must be a string");
+    }
+    const result = await downloadLogo(queryQ);
+    res.set('Content-Type', 'image/png'); // Assuming clearbit returns PNG, or could be more dynamic
     return res.send(result);
-  }catch(e) {
+  } catch(e) {
     console.error(e);
-    res.send(e);
+    res.status(500).send(e instanceof Error ? e.message : "Internal Server Error");
   }
 });
 
 if(!isDev) {
-  app.use((req, res) => {
+  app.get('*', (req: Request, res: Response) => {
     res.sendFile(path.join(distPath, 'index.html'));
   });
 }

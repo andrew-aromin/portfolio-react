@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { cleanAndValidate, blobToBase64 } from '../helpers';
+import { cleanAndValidate, blobToBase64 } from './helpers.ts';
 import axios from 'axios';
 import './App.css'
 
 function App() {
-  const { UNSANITZED_COMPANY_NAME } = useParams();
-  const [image, setImg] = useState(null);
+  const { UNSANITZED_COMPANY_NAME } = useParams<{ UNSANITZED_COMPANY_NAME: string }>();
+  const [image, setImg] = useState<string | null>(null);
   
   useEffect(() => {
     if (!UNSANITZED_COMPANY_NAME) return;
@@ -35,9 +35,11 @@ function App() {
 
         if(data) {
           // convert the blob so we can also store it in local cache
-          const base64 = await blobToBase64(data);
-          localStorage.setItem(cleanedName, base64);
-          setImg(base64);
+          const result = await blobToBase64(data);
+          if (typeof result === 'string') {
+            localStorage.setItem(cleanedName, result);
+            setImg(result);
+          }
         }
 
       }catch(e) {
@@ -45,7 +47,7 @@ function App() {
       }
     })();
 
-  }, []);
+  }, [UNSANITZED_COMPANY_NAME]);
 
   return (
     <>

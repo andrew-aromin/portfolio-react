@@ -1,7 +1,8 @@
 import xss from 'xss';
 import validator from 'validator';
 
-export function cleanAndValidate(input) {
+export function cleanAndValidate(input: string | undefined): string | null {
+  if (!input) return null;
   const sanitized = xss(input);
 
   const isValid = validator.isURL(sanitized, {
@@ -11,7 +12,7 @@ export function cleanAndValidate(input) {
   return isValid ? sanitized : null;
 }
 
-export async function blobToBase64(blob) {
+export async function blobToBase64(blob: Blob): Promise<string | ArrayBuffer | null> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onloadend = () => resolve(reader.result); // returns data URL
